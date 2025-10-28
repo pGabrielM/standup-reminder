@@ -1,5 +1,12 @@
 /// <reference types="chrome"/>
-import { TimerState, DEFAULT_INTERVAL, DEFAULT_SNOOZE_TIME, ALARM_NAME } from '../types/timer';
+import {
+  TimerState,
+  DEFAULT_INTERVAL,
+  DEFAULT_SNOOZE_TIME,
+  DEFAULT_LANGUAGE,
+  ALARM_NAME,
+} from '../types/timer';
+import { translations } from '../i18n/translations';
 
 // Estado inicial do timer
 const getInitialState = (): TimerState => ({
@@ -9,6 +16,7 @@ const getInitialState = (): TimerState => ({
   isActive: false,
   lastUpdateTime: Date.now(),
   snoozeTime: DEFAULT_SNOOZE_TIME,
+  language: DEFAULT_LANGUAGE,
 });
 
 // Carregar estado do storage
@@ -36,9 +44,11 @@ const clearAlarm = (): void => {
 };
 
 // Mostrar notificação
-const showNotification = async (): Promise<void> => {
+const showNotification = async (state: TimerState): Promise<void> => {
   try {
     console.log('⏰ Timer finalizado! Disparando notificação...');
+
+    const t = translations[state.language || 'pt'];
 
     // Criar um ícone simples usando data URL
     const iconDataUrl = 'data:image/svg+xml;base64,' + btoa(`
@@ -54,14 +64,14 @@ const showNotification = async (): Promise<void> => {
     const notificationId = await chrome.notifications.create({
       type: 'basic',
       iconUrl: iconDataUrl,
-      title: '⏰ Hora de se levantar!',
-      message: 'Você está sentado há um tempo. Levante-se, estique-se e movimente-se por alguns minutos!',
+      title: t.notificationTitle,
+      message: t.notificationMessage,
       priority: 2,
       requireInteraction: true,
       silent: false, // Reproduz som de notificação
       buttons: [
-        { title: '✓ Já me levantei' },
-        { title: '⏰ Adiar' },
+        { title: t.notificationButton1 },
+        { title: t.notificationButton2 },
       ],
     });
 
@@ -227,7 +237,7 @@ const processAlarmTick = async (): Promise<void> => {
 
   if (state.remainingTime <= 0) {
     console.log('🔔 Tempo esgotado! Disparando notificação...');
-    await showNotification();
+    await showNotification(state);
     state.remainingTime = state.interval * 60;
     console.log(`♻️ Timer resetado para ${state.interval} minutos`);
   }

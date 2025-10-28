@@ -23,25 +23,34 @@ Extensão moderna do Chrome para lembrá-lo de se levantar da cadeira regularmen
 - ⏰ Botão "Adiar" direto na notificação
 
 ### ⏱️ Sistema de Adiamento Configurável
-- 🕐 **Tempo de adiamento personalizável**: Configure de 1 a 120 minutos
+- 🕐 **Tempo de adiamento personalizável**: Configure de 1 a 120 minutos (padrão: 15 min)
 - ➕ **Adiamento inteligente**: O tempo é ADICIONADO ao tempo restante (não substituído)
 - ✨ **Animação profissional**: Efeito de confetti ao adiar para feedback visual
 - 🎯 **Exemplo**: 30min restantes + adiar 15min = 45min restantes
+- 🎨 **Quick-fill badges**: Clique em valores pré-definidos (5, 10, 15, 20, 30 min)
 
 ### 🎨 Ícone Dinâmico
-- 🔴 **Badge com minutos**: Veja quantos minutos faltam direto no ícone da extensão
-- � **Estados visuais**: Cores diferentes para cada estado
-  - 🔵 Azul: Timer ativo
-  - 🟡 Amarelo: Timer pausado  
-  - 🔴 Vermelho: Alerta/notificação
-- 🖼️ **Ícone gerado dinamicamente**: Canvas API renderiza o número de minutos em tempo real
+- 🏷️ **Badge compacto**: Veja o tempo restante direto no ícone (45m, 1h, 1h30, 5h15)
+- 📊 **Estados visuais**: Badge muda conforme o estado
+  - Tempo restante durante timer ativo
+  - ⏸ quando pausado
+  - Vazio quando inativo
+
+### 🌍 Suporte Multi-idioma
+- 🇧🇷 **Português**: Interface completa traduzida
+- 🇺🇸 **English**: Full English translation
+- 🇪🇸 **Español**: Traducción completa
+- � **Troca fácil**: Selecione o idioma nas configurações
+- 💾 **Persistente**: Idioma escolhido é salvo automaticamente
 
 ### 💎 Interface Profissional
 - 🌈 Design moderno com gradientes e glassmorphism
 - 🎨 Feedback visual imediato em todas as ações
 - ⭕ Anel de progresso circular animado
 - 🎭 Cores que mudam baseado no estado
-- 📱 Layout responsivo otimizado para popup do Chrome
+- 📱 Layout compacto otimizado (420x540px - sem scroll)
+- 🎯 **Quick-fill badges**: Valores pré-definidos para configuração rápida (30min, 45min, 1h, 1h30, 2h)
+- ⚠️ **Validações visuais**: Mensagens de erro em cards vermelhos (não em alertas genéricos)
 
 ## 🛠️ Tecnologias Utilizadas
 
