@@ -4,13 +4,44 @@ Extensão moderna do Chrome para lembrá-lo de se levantar da cadeira regularmen
 
 ## ✨ Funcionalidades
 
-- ⏰ **Timer Personalizável**: Configure o intervalo de tempo entre 1 e 480 minutos
-- ▶️ **Controles Completos**: Iniciar, pausar, despausar e resetar o timer
-- 🔔 **Notificações**: Alertas visuais quando é hora de se levantar
-- ⏱️ **Botão Adiar**: Adie o lembrete por 15 minutos adicionais
-- ✅ **Confirmação Rápida**: Botão para confirmar que você já se levantou
-- 🎨 **Interface Moderna**: Design limpo e responsivo com React e Tailwind CSS
-- 📊 **Badge Visual**: Mostra o tempo restante no ícone da extensão
+### 🎯 Timer Personalizável
+- ⏰ Configure o intervalo de tempo entre 1 e 480 minutos (8 horas)
+- ⏱️ Contagem regressiva em tempo real com atualização dinâmica
+- 📊 Anel de progresso circular com animações suaves
+
+### 🎮 Controles Completos
+- ▶️ **Iniciar**: Começa a contagem regressiva
+- ⏸️ **Pausar**: Pausa o timer mantendo o tempo restante
+- ⏯️ **Continuar**: Retoma de onde parou
+- 🔄 **Resetar**: Volta ao tempo configurado
+
+### 🔔 Notificações Inteligentes
+- 🚨 Alertas sonoros quando o tempo acabar
+- 💬 Notificações interativas com botões de ação
+- 📱 Prioridade alta para não passar despercebido
+- ✅ Botão "Já me levantei" para resetar
+- ⏰ Botão "Adiar" direto na notificação
+
+### ⏱️ Sistema de Adiamento Configurável
+- 🕐 **Tempo de adiamento personalizável**: Configure de 1 a 120 minutos
+- ➕ **Adiamento inteligente**: O tempo é ADICIONADO ao tempo restante (não substituído)
+- ✨ **Animação profissional**: Efeito de confetti ao adiar para feedback visual
+- 🎯 **Exemplo**: 30min restantes + adiar 15min = 45min restantes
+
+### 🎨 Ícone Dinâmico
+- 🔴 **Badge com minutos**: Veja quantos minutos faltam direto no ícone da extensão
+- � **Estados visuais**: Cores diferentes para cada estado
+  - 🔵 Azul: Timer ativo
+  - 🟡 Amarelo: Timer pausado  
+  - 🔴 Vermelho: Alerta/notificação
+- 🖼️ **Ícone gerado dinamicamente**: Canvas API renderiza o número de minutos em tempo real
+
+### 💎 Interface Profissional
+- 🌈 Design moderno com gradientes e glassmorphism
+- 🎨 Feedback visual imediato em todas as ações
+- ⭕ Anel de progresso circular animado
+- 🎭 Cores que mudam baseado no estado
+- 📱 Layout responsivo otimizado para popup do Chrome
 
 ## 🛠️ Tecnologias Utilizadas
 

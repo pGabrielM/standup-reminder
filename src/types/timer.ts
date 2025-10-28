@@ -5,6 +5,7 @@ export interface TimerState {
   isPaused: boolean;
   isActive: boolean;
   lastUpdateTime: number;
+  snoozeTime: number; // em minutos (configurável)
 }
 
 export interface StorageData {
@@ -12,6 +13,6 @@ export interface StorageData {
 }
 
 export const DEFAULT_INTERVAL = 60; // 60 minutos padrão
-export const SNOOZE_TIME = 15; // 15 minutos para adiar
+export const DEFAULT_SNOOZE_TIME = 15; // 15 minutos padrão para adiar
 
 export const ALARM_NAME = 'standupReminder';

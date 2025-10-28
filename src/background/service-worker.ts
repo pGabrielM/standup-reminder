@@ -1,5 +1,5 @@
 /// <reference types="chrome"/>
-import { TimerState, DEFAULT_INTERVAL, ALARM_NAME, SNOOZE_TIME } from '../types/timer';
+import { TimerState, DEFAULT_INTERVAL, DEFAULT_SNOOZE_TIME, ALARM_NAME } from '../types/timer';
 
 // Estado inicial do timer
 const getInitialState = (): TimerState => ({
@@ -8,6 +8,7 @@ const getInitialState = (): TimerState => ({
   isPaused: false,
   isActive: false,
   lastUpdateTime: Date.now(),
+  snoozeTime: DEFAULT_SNOOZE_TIME,
 });
 
 // Carregar estado do storage
@@ -36,39 +37,72 @@ const clearAlarm = (): void => {
 
 // Mostrar notificação
 const showNotification = async (): Promise<void> => {
-  await chrome.notifications.create({
-    type: 'basic',
-    iconUrl: 'icons/icon128.png',
-    title: '⏰ Hora de se levantar!',
-    message: 'Você está sentado há um tempo. Levante-se, estique-se e movimente-se por alguns minutos!',
-    priority: 2,
-    requireInteraction: true,
-    buttons: [
-      { title: '✓ Já me levantei' },
-      { title: '⏰ Adiar 15 min' },
-    ],
-  });
+  try {
+    console.log('⏰ Timer finalizado! Disparando notificação...');
+
+    const notificationId = await chrome.notifications.create({
+      type: 'basic',
+      iconUrl: chrome.runtime.getURL('icons/icon128.png'),
+      title: '⏰ Hora de se levantar!',
+      message: 'Você está sentado há um tempo. Levante-se, estique-se e movimente-se por alguns minutos!',
+      priority: 2,
+      requireInteraction: true,
+      silent: false, // Reproduz som de notificação
+      buttons: [
+        { title: '✓ Já me levantei' },
+        { title: '⏰ Adiar' },
+      ],
+    });
+
+    console.log('✅ Notificação criada com ID:', notificationId);
+
+    // Feedback adicional via badge
+    await chrome.action.setBadgeText({ text: '!' });
+  } catch (error) {
+    console.error('❌ Erro ao criar notificação:', error);
+    // Fallback: apenas atualizar badge
+    await chrome.action.setBadgeText({ text: '!' });
+  }
+};// Formatar tempo para badge (compacto)
+const formatBadgeTime = (seconds: number): string => {
+  const totalMinutes = Math.ceil(seconds / 60);
+
+  // Menos de 60 minutos: mostrar apenas minutos
+  if (totalMinutes < 60) {
+    return `${totalMinutes}m`;
+  }
+
+  // 60 minutos ou mais: mostrar horas e minutos
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+
+  if (mins === 0) {
+    return `${hours}h`;
+  }
+
+  return `${hours}h${mins}`;
 };
 
-// Atualizar badge do ícone da extensão
+// Atualizar badge da extensão
 const updateBadge = async (state: TimerState): Promise<void> => {
-  if (!state.isActive) {
-    await chrome.action.setBadgeText({ text: '' });
-    return;
+  try {
+    if (!state.isActive) {
+      await chrome.action.setBadgeText({ text: '' });
+      return;
+    }
+
+    if (state.isPaused) {
+      await chrome.action.setBadgeText({ text: '⏸' });
+      return;
+    }
+
+    // Badge com tempo formatado (apenas texto, sem cores)
+    const badgeText = formatBadgeTime(state.remainingTime);
+    await chrome.action.setBadgeText({ text: badgeText });
+  } catch (error) {
+    console.error('Erro ao atualizar badge:', error);
   }
-
-  if (state.isPaused) {
-    await chrome.action.setBadgeText({ text: '⏸' });
-    await chrome.action.setBadgeBackgroundColor({ color: '#ef4444' });
-    return;
-  }
-
-  const minutes = Math.ceil(state.remainingTime / 60);
-  await chrome.action.setBadgeText({ text: minutes.toString() });
-  await chrome.action.setBadgeBackgroundColor({ color: '#0ea5e9' });
-};
-
-// Iniciar timer
+};// Iniciar timer
 export const startTimer = async (): Promise<void> => {
   const state = await loadState();
   state.isActive = true;
@@ -87,6 +121,14 @@ export const startTimer = async (): Promise<void> => {
 // Pausar timer
 export const pauseTimer = async (): Promise<void> => {
   const state = await loadState();
+
+  // Se estiver ativo e não pausado, calcular tempo restante antes de pausar
+  if (state.isActive && !state.isPaused) {
+    const now = Date.now();
+    const elapsedSeconds = Math.floor((now - state.lastUpdateTime) / 1000);
+    state.remainingTime = Math.max(0, state.remainingTime - elapsedSeconds);
+  }
+
   state.isPaused = true;
   state.lastUpdateTime = Date.now();
 
@@ -120,11 +162,11 @@ export const resetTimer = async (): Promise<void> => {
   }
 };
 
-// Adiar timer - ADICIONA 15 minutos ao tempo atual
+// Adiar timer - ADICIONA snoozeTime minutos ao tempo atual
 export const snoozeTimer = async (): Promise<void> => {
   const state = await loadState();
-  // Adiciona 15 minutos ao tempo restante atual
-  state.remainingTime = state.remainingTime + (SNOOZE_TIME * 60);
+  // Adiciona snoozeTime minutos ao tempo restante atual
+  state.remainingTime = state.remainingTime + (state.snoozeTime * 60);
   state.lastUpdateTime = Date.now();
 
   await saveState(state);
@@ -146,6 +188,15 @@ export const updateInterval = async (minutes: number): Promise<void> => {
   await updateBadge(state);
 };
 
+// Atualizar tempo de adiamento
+export const updateSnoozeTime = async (minutes: number): Promise<void> => {
+  const state = await loadState();
+  state.snoozeTime = minutes;
+  state.lastUpdateTime = Date.now();
+
+  await saveState(state);
+};
+
 // Processar tick do alarme
 const processAlarmTick = async (): Promise<void> => {
   const state = await loadState();
@@ -161,9 +212,13 @@ const processAlarmTick = async (): Promise<void> => {
   state.remainingTime = Math.max(0, state.remainingTime - elapsedSeconds);
   state.lastUpdateTime = now;
 
+  console.log(`⏱️ Tick do alarme - Tempo restante: ${state.remainingTime}s`);
+
   if (state.remainingTime <= 0) {
+    console.log('🔔 Tempo esgotado! Disparando notificação...');
     await showNotification();
     state.remainingTime = state.interval * 60;
+    console.log(`♻️ Timer resetado para ${state.interval} minutos`);
   }
 
   await saveState(state);
@@ -210,6 +265,9 @@ chrome.runtime.onMessage.addListener((message: any, _sender: chrome.runtime.Mess
         break;
       case 'updateInterval':
         await updateInterval(message.interval);
+        break;
+      case 'updateSnoozeTime':
+        await updateSnoozeTime(message.snoozeTime);
         break;
       case 'getState':
         return await loadState();
