@@ -40,9 +40,20 @@ const showNotification = async (): Promise<void> => {
   try {
     console.log('⏰ Timer finalizado! Disparando notificação...');
 
+    // Criar um ícone simples usando data URL
+    const iconDataUrl = 'data:image/svg+xml;base64,' + btoa(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+        <rect width="128" height="128" rx="25" fill="#3b82f6"/>
+        <circle cx="64" cy="64" r="35" fill="none" stroke="white" stroke-width="8"/>
+        <line x1="64" y1="64" x2="54" y2="50" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        <line x1="64" y1="64" x2="68" y2="38" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="64" cy="64" r="5" fill="white"/>
+      </svg>
+    `);
+
     const notificationId = await chrome.notifications.create({
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/icon128.png'),
+      iconUrl: iconDataUrl,
       title: '⏰ Hora de se levantar!',
       message: 'Você está sentado há um tempo. Levante-se, estique-se e movimente-se por alguns minutos!',
       priority: 2,
